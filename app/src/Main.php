@@ -14,17 +14,13 @@ class Main
     {
         $this->init();
 
-        $_namespace = $this->route->getParent();
-        $namespace = [];
-        foreach($_namespace as $value){
-            array_push($namespace, ucfirst($value));
-        }
-        
+        $namespace = $this->route->getParent();
+         
 
         $base = $this->route->getBase();
 
-        if($base){
-            $base = lcfirst($base[0]);
+        if($base){  
+
             $class = 'Controllers\\' . implode('\\',$namespace);
  
 

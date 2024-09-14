@@ -12,6 +12,8 @@ class Login
      * @return string
      */
 
+    
+
     public function index(Get $request) : string
     {
         return print_r($request, true);
