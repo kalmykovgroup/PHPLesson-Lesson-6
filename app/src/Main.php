@@ -1,19 +1,11 @@
 <?php
  
-use Request\Get;
-use Request\Post;
-use Routing\Route;
-use Request\Server;
-use Shop\Customer\Order;  
+use Request\Request; 
+use Routing\Route; 
 
 class Main
-{   
-    private Get $get;
-
-    private Post $post;
-
-    private Server $server;
-
+{    
+    private Request $request;
     private Route $route;
 
 
@@ -34,20 +26,26 @@ class Main
         if($base){
             $base = lcfirst($base[0]);
             $class = 'Controllers\\' . implode('\\',$namespace);
-
-
-            var_dump($class);
-            var_dump($base);
+ 
 
             $object = new $class();
 
-
-            if($this->server->isGet()){
-                echo $object -> $base($this->get);     
-            } 
-            elseif($this->server->isPost()){
-                echo $object -> $base($this->post); 
+            try{
+                if($this->request->server()->isGet()){
+                    echo $object -> $base($this->request->get());     
+                } 
+                elseif($this->request->server()->isPost()){
+                    echo $object -> $base($this->request->post()); 
+                }
+            }catch(Exception $e){
+                echo $e->getMessage();
+              
             }
+            catch(\Throwable $e){
+                echo "Method not fount";
+              
+            } 
+          
         }       
  
     }
@@ -58,10 +56,7 @@ class Main
         
          Autoload::registrate();
 
-        $this->get = new Get($_GET);
-        $this->post = new Post($_POST);
-        $this->server = new Server($_SERVER);
-
+        $this->request = new Request(); 
         $this->route = new Route($_SERVER['REQUEST_URI']);
     }
 
