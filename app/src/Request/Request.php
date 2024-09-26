@@ -1,17 +1,10 @@
 <?php
+namespace Request;
 
-//1.6 Создайте класс Request который объединит 3 экземпляра Get, Post, Files.
-//1.7 Ознакомьтесь с глобальным массивом $_SERVER
-//1.8 Добавьте в класс Request параметр отвечающий за метод пришедшего запроса (get/post).
-/*
-Задача на доп балы:
-	Реализовать классы Get, Post, Files по шаблону Singleton
-	Добавьте в Request метод getUrl который вернет url, по которому пришел пользователь без get параметров и без ?. Пример: пользователь идет по ссылке /test-page?search=hi , метод должен вернуть /test-page
-*/
-
-include_once 'Post.php';
-include_once 'Get.php';
-include_once 'Files.php';
+use Request\Get;
+use Request\Post;
+use Request\Server;
+ 
 
 enum Method{
     case GET;
@@ -22,9 +15,9 @@ enum Method{
 
 class Request
 {
-    public Get $get;
-    public Post $post;
-    public Files $files;
+    private Get $get;
+    private Post $post; 
+    private Server $server; 
 
     //1.8 Добавьте в класс Request параметр отвечающий за метод пришедшего запроса (get/post).
     public Method $method;
@@ -38,9 +31,9 @@ class Request
             case 'DELETE': $this->method = Method::DELETE; break;
         }
 
-        $this->get = Get::getInstance($_GET);
-        $this->post = Post::getInstance($_POST);
-        $this->files = Files::getInstance($_FILES);
+        $this->get = new Get($_GET);
+        $this->post = new Post($_POST); 
+        $this->server = new Server($_SERVER); 
     }
 
     public function getUrl() : string
@@ -58,5 +51,21 @@ class Request
             Method::PUT => 'PUT',
             Method::DELETE => 'DELETE',
         };
+    }
+
+
+    public function get(): Get
+    {
+         return $this->get;
+    }
+
+    public function post(): Post
+    {
+         return $this->post;
+    }
+
+    public function server(): Server
+    {
+         return $this->server;
     }
 }
