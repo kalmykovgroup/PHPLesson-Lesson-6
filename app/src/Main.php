@@ -1,10 +1,10 @@
 <?php
- 
+
 use Request\Get;
 use Request\Post;
-use Routing\Route;
 use Request\Server;
-use Shop\Customer\Order;  
+use Routing\Route;
+use Models\User;
 
 class Main
 {   
@@ -22,41 +22,37 @@ class Main
     {
         $this->init();
 
-        $_namespace = $this->route->getParent();
-        $namespace = [];
-        foreach($_namespace as $value){
-            array_push($namespace, ucfirst($value));
-        }
-        
+        $namespace = $this->route->getParent();
 
         $base = $this->route->getBase();
 
         if($base){
-            $base = lcfirst($base[0]);
-            $class = 'Controllers\\' . implode('\\',$namespace);
-
-
-            var_dump($class);
-            var_dump($base);
-
+            $class = 'Controllers\\' . implode('\\',$namespace ). '\\' . $base[0];
+            
             $object = new $class();
 
-
             if($this->server->isGet()){
-                echo $object -> $base($this->get);     
+                echo $object -> getRequest($this->get);     
             } 
-            elseif($this->server->isPost()){
-                echo $object -> $base($this->post); 
+            elseif($this->server->isPost()){               
+                echo $object -> postRequest($this->post); 
             }
-        }       
- 
+        }  
     }
 
 
     private function init() : void
     {
-        
-         Autoload::registrate();
+        spl_autoload_register(function($class){
+            $file = __DIR__ . '/' . str_replace('\\','/', $class).'.php';  
+
+            if(file_exists($file)){                
+                include($file);
+                return true;
+            }
+
+            return false;
+        });
 
         $this->get = new Get($_GET);
         $this->post = new Post($_POST);
